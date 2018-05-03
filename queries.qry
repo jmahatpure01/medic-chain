@@ -1,0 +1,21 @@
+query selectMedicinesByOwner {
+  description: "Select all medicines based on their owner"
+  statement:
+      SELECT org.medic.chain.Medicine
+          WHERE (owner == _$owner)
+}
+
+query selectTransfersByMedicine {
+  description: "Select all transfers based on their medicine"
+  statement:
+      SELECT org.medic.chain.Transfer
+          WHERE (medicine == _$medicine)
+}
+
+query selectHistorianDataByMedicine {
+  description: "Select all Historian data based on their medicine"
+  statement:
+      SELECT org.hyperledger.composer.system.HistorianRecord FROM 
+HistorianRegistry
+          WHERE (transactionId == _$transactionId)
+}

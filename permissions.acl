@@ -1,0 +1,111 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule ManufacturerTypeUserAssets {
+  description: "Grant Manufacturers the right to create read and update assets"
+  participant(m): "org.medic.chain.User"
+  operation: CREATE, UPDATE
+  resource: "org.medic.chain.Medicine"
+  condition: (m.type == 'Manufacturer')
+  action: ALLOW
+}
+
+rule OtherTypeUserAssets {
+  description: "Deny everyone except manufacturer the right to create and update assets"
+  participant(m): "org.medic.chain.User"
+  operation: CREATE, UPDATE
+  resource: "org.medic.chain.Medicine"
+  condition: (m.type != 'Manufacturer')
+  action: DENY
+}
+
+rule AllTypeUserAssets {
+  description: "Grant Everyone the right to read assets"
+  participant(m): "org.medic.chain.User"
+  operation: READ
+  resource: "org.medic.chain.Medicine"
+  condition: (m.type == 'Manufacturer' || m.type == 'Distributor' || m.type == 'Wholesaler' || m.type == 'Retailer' || m.type == 'Customer')
+  action: ALLOW
+}
+
+rule SubmitTransactionGrant {
+  description: "Grant Distributor, Wholesaler, Retailer and Manufacturer the right to transfer assets"
+  participant(m): "org.medic.chain.User"
+  operation: CREATE
+  resource: "org.medic.chain.Transfer"
+  condition: (m.type == 'Distributor' || m.type == 'Wholesaler' || m.type == 'Retailer' || m.type == 'Manufacturer')
+  action: ALLOW
+}
+
+rule CustomerTypeUserDenyTransaction {
+  description: "Deny Customers the right to transfer assets"
+  participant(m): "org.medic.chain.User"
+  operation:  CREATE
+  resource: "org.medic.chain.Transfer"
+  condition: (m.type == 'Customer')
+  action: DENY
+}
+
+rule EveryoneDenyUpdateTransaction {
+  description: "Deny Everyone the right to update transfer"
+  participant(m): "org.medic.chain.User"
+  operation:  UPDATE
+  resource: "org.medic.chain.Transfer"
+  condition: (m.type == 'Manufacturer' || m.type == 'Distributor' || m.type == 'Wholesaler' || m.type == 'Retailer' || m.type == 'Customer')
+  action: DENY
+}
+
+
+rule EveryUserGrantReadTransaction {
+  description: "Grant Everyone the right to read transfer"
+  participant(m): "org.medic.chain.User"
+  operation:  READ
+  resource: "org.medic.chain.Transfer"
+  condition: (m.type == 'Manufacturer' || m.type == 'Distributor' || m.type == 'Wholesaler' || m.type == 'Retailer' || m.type == 'Customer')
+  action: ALLOW
+}
+
+rule GrantCreateUser {
+  description: "Grant Manufacturer, Distributor, Wholesaler the right to create user"
+  participant(m): "org.medic.chain.User"
+  operation:  CREATE, UPDATE
+  resource: "org.medic.chain.User"
+  condition: (m.type == 'Manufacturer' || m.type == 'Distributor' || m.type == 'Wholesaler')
+  action: ALLOW
+} 
+
+rule DenyCreateUser {
+  description: "Grant Retailer, Customer the right to create user"
+  participant(m): "org.medic.chain.User"
+  operation:  CREATE, UPDATE
+  resource: "org.medic.chain.User"
+  condition: (m.type == 'Retailer' || m.type == 'Customer')
+  action: DENY
+} 
