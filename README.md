@@ -1,3 +1,3 @@
 # medic-chain
 
-A track and Trace system for medicines
+A Hyperledger Composer blockchain application for track and trace system of medicines
